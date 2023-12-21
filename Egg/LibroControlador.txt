@@ -1,0 +1,49 @@
+@Controller
+@RequestMapping("/libro")
+public class LibroControlador {
+    
+    @Autowired//Spring se encargará de crear el objeto LibroServicio y asignarlo automáticamente a la variable libroServicio. es lo mismo que "MiServicio servicio = new MiServicio();"
+    private LibroServicio libroServicio;
+    @Autowired
+    private AutorServicio autorServicio;
+    @Autowired
+    private EditorialServicio editorialServicio;
+    
+    
+    @GetMapping("/registrar") //localhost:8080/libro/registrar
+    public String registrar(ModelMap modelo){
+        List<Autor> autores = autorServicio.listarAutores();
+        List<Editorial> editoriales = editorialServicio.listarEditoriales();
+        
+        modelo.addAttribute("autores", autores);
+        modelo.addAttribute("editoriales", editoriales);
+        
+        return "libro_form.html";
+    }
+    
+    @PostMapping("/registro")
+    public String registro(@RequestParam(required = false) Long isbn, @RequestParam String titulo,
+            @RequestParam(required = false) Integer ejemplares, @RequestParam String idAutor,
+            @RequestParam String idEditorial, ModelMap modelo) {// los modelos sirven en Spring para que nosotros insertemos en el toda la info que vamos a mostrar por pantalla o que vamos a usar en la interface del usuario
+        try {
+            libroServicio.crearLibro(isbn, titulo, ejemplares, idAutor, idEditorial);
+            modelo.putIfAbsent("exito", "El libro fue cargado con exito");
+        } catch (MiException ex) {
+            List<Autor> autores = autorServicio.listarAutores();
+            List<Editorial> editoriales = editorialServicio.listarEditoriales();
+
+            modelo.addAttribute("autores", autores);
+            modelo.addAttribute("editoriales", editoriales);
+            modelo.put("error", ex.getMessage());// traemos el texto que pusimos en el servicio
+
+            return "libro_form.html";  // volvemos a cargar el formulario.
+        }
+        return "index.html";
+    }
+        @GetMapping("/lista")
+    public String listar(ModelMap modelo) {
+        List<Libro> libros = libroServicio.listarLibros();
+        modelo.addAttribute("libros", libros);
+
+        return "libro_list";
+    }

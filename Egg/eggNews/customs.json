@@ -1,0 +1,14 @@
+{
+    "elements": {},
+    "attributes": {
+        "th:text": {
+            "context": "h1"
+        },
+        "th:if": {},
+        "th:src": {},
+        "th:action": {},
+        "<title": {},
+        "th:href": {},
+        "th:each": {}
+    }
+}
